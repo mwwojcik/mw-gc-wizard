@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
     //val machine = GcLogAnalyzer()
     //machine.run()
     //runApplication<GcLogInterpreterApplication>(*args)
-    val gcLogFile = "/Users/mariusz.wojcik/workspace/git-repo/gc-log-interpreter/gclogs/2b3a8d4c-3d59-474e-b2a1-6030e4b7027d.log"
+    val gcLogFile = "gclogs/2b3a8d4c-3d59-474e-b2a1-6030e4b7027d.log"
 
     require(!gcLogFile.isBlank()) { "This sample requires a path to a GC log file." }
 
@@ -69,7 +69,7 @@ fun analyze(gcLogFile: String?) {
             }
 
     val df = machine.getAggregation(G1DataAggregation::class.java).get().dataFrame()
-    df.writeCSV("/Users/mariusz.wojcik/workspace/git-repo/gc-log-interpreter/gclogs/pauses.csv")
+    df.writeCSV("gclogs/pauses.csv")
 
     val stop = Instant.now()
 
