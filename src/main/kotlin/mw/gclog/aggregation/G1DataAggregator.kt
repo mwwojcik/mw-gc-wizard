@@ -70,7 +70,7 @@ class G1DataAggregation : Aggregation() {
             when (k) {
                 "type" -> v.add(event.garbageCollectionType)
                 "event_type" -> v.add("PauseEvent")
-                "startedAt" -> v.add(event.dateTimeStamp)
+                "startedAt" -> v.add(event.dateTimeStamp.dateTime)
                 "duration" -> v.add(event.duration)
                 "cause" -> v.add(event.gcCause)
                 "cpu_user" -> v.add(event.cpuSummary?.user ?: 0)
@@ -94,7 +94,7 @@ class G1DataAggregation : Aggregation() {
             when (k) {
                 "type" -> v.add(event.garbageCollectionType)
                 "event_type" -> v.add("ConcurrentEvent")
-                "startedAt" -> v.add(event.dateTimeStamp)
+                "startedAt" -> v.add(event.dateTimeStamp.dateTime)
                 "duration" -> v.add(event.duration)
                 "cause" -> v.add(event.gcCause)
                 "cpu_user" -> v.add(0)
