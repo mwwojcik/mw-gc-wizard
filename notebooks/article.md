@@ -2,22 +2,20 @@
 
 Garbage Collector to cichy bohater każdej aplikacji java. Zamknięty wewnątrz czarnego pudła z etykieta "jvm" wykonuje ciężką pracę, której nikt inny wykonywać nie chce.  Chwalimy go rzadko, bo  gdy radzi sobie świetnie, jest niewidoczny. Narzekamy, gdy jego nieprawidłowa praca skutkuje nadmiernym zużywaniem pamięci lub niespodziewanymi pauzami aplikacji. Poszukiwanie przyczyn to proces trudny i czasochłonny. Wymaga wiedzy na temat działania wirtualnej maszyny, modelu pamięciowego oraz specyfiki działania samego Garbage Collectora. Na szczęście nie pozostajemy z tym sami, dysponujemy narzędziami, które mogą nam w tym pomóc. W dzisiejszym artykule opiszę w jaki sposób sami możemy stworzyć takie narzędzie.
 
+Zanim zaczniemy jednak pisać kod, przypomnijmy sobie kilka najważniejszych informacji o naszym bohaterze.
 
+Garbage Collector to proces JVM specjalizujący się w przydzielaniu i zwalnianiu pamięci. 
 
-The Garbage Collector is a JVM process specialized for allocating and releasing memory. It works in the background and is completely invisible to the programmer.
-The Garbage Collector analyzes the links between objects, finds those that are not necessary, and then removes them.
-
-The Garbage Collector cannot afford to clean the entire available memory area. Such an operation would be long-term and would have a negative impact on the performance of the entire application. 
-
-Thats why memory is divided into regions - called generations (young and old). The young generation is divided into several internal areas, called eden, survivor0, survivor1. In each of these areas, objects of a certain maturity are stored.New objects are created in the eden space, while the oldest objects ultimately end up in the old space. 
-
-Each generation can be clean in separate cycles - we call them collections. During these cycles, the Garbage Collector moves the used objects to areas with higher stability.
+Bazuje on na koncepcji zwanej Hipotezą Generacyjną. Zakłada ona, że najszybciej giną obiekty najmłodsze. Im obiekt jest starszy, tym szanse na jego przetrwanie są większa.  
+Zgodnie z tym założeniem,  pamięć została podzielona na regiony- nazywane generacjami (młodą i starą). Młoda generacja jest podzielona na kilka wewnętrznych obszarów, nazywanych Eden, Survivor 0, Survivor 1. W każdym z tych obszarów przechowywane są obiekty o określonej dojrzałości. 
+Nowe obiekty są tworzone w przestrzeni Eden. Następnie Garbage Collector przenosi obiekty używane do obszarów o większej stabilności. W ten sposób obiekty "wędrują" najpierw we wnętrzu generacji nowej, a następnie, te które żyją najdłużej nagradzane są promocją są do generacji starej. Obiekty nieużywane są usuwane.
 
 <img style="margin-right:20px;" src="gcgeneration.png"> 
-
-<img style="float: left; margin-right:20px;" src="idea.png">  **Tip:** These divisions result from the concept on which the Garbage Collector is based - the generation hypothesis. It assumes that the latest created objects become unnecessary the fastest. Objects that survive several cleaning cycles become stable and are less likely to be removed.
-
 <div style="clear:both"></div>
+
+Taka organizacja procesu zarządzania pamięcią pozwala na jego optymalizację. Każdą generację można sprzątać w oddzielnych, cyklach- które nazywają się kolekcjami. Ponieważ ich działanie ogranicza się do określonego obszaru, mogą podlegać dużej specjalizacji. Dzięki temu zużywają mniej zasobów i mają mniejszy wpływ na aplikację.  
+
+Niektóre kolekcje  mają szczególnie duży wpływ na wydajność aplikacji, ponieważ wymagają zatrzymania wątków- nazywamy to pauzami GC (lub fazą stop-the-world). Podczas tych pauz nasza aplikacja jest zatrzymywana i nie może wykonywać swoich zadań biznesowych. 
 
 In the case of G1 GC, we can distinguish between four main types collection cycles:
 
@@ -40,22 +38,26 @@ In the case of G1 GC, we can distinguish between four main types collection cycl
     </tr>
 </table>
 
-<img style="float: left; margin-right:20px;" src="idea.png">  **Tip:** You can find a detailed description of how the GC works in the book [Java® Performance Companion](https://www.oreilly.com/library/view/java-performance-companion/9780133796896)
+**Tip:** You can find a detailed description of how the GC works in the book [Java® Performance Companion](https://www.oreilly.com/library/view/java-performance-companion/9780133796896)
 
 <div style="clear:both"></div>
 
-Some collections (or collection stages) have a particularly large impact on the application's performance because they require threads to stop - we call them GC pauses (or stop-the-world-phase). During these pauses, our application is stopped and does not perform its tasks!
+Niestety źle działający GC może być powodem wielu problemów.
 
-For a well-functioning Garbage Collector, pauses should be as short as possible, and as much memory as possible should be freed up as a result.
+Czasami można zauważyć, że pauzy aplikacji występują zbyt często lub trwają zbyt długo. W rezultacie nasza aplikacja dramatycznie zwalnia i pojawiają się dziwne trudne do diagnozowania problemy wydajnościowe. 
 
-Unfortunately, the Garbage Collector does not always work well. 
+Drugim często spotykanym problemem jest wyciek pamięci. Występuje on, gdy zwalnianie pamięci jest niewydajne. Garbage Collector (z różnych możliwych powodów) nie może usunąć obiektów, które powinny zostać wyrzucone. Zużywana zostaje cała dostępna pamięć.
 
-Sometimes you may find that application pauses happen too often, or last too long. As a result, our application slows down and performance problems that are difficult to diagnose occur.
+I teraz zbliżamy się do sedna problemu, jak określić czy nasz GC działa w sposób prawidłowy. 
 
-In another scenario, the malfunctioning of the Garbage Collector leads to memory leaks. These occur when memory release is inefficient. The Garbage Collector (due to various possible reasons) cannot delete objects that should be discarded. This results in the gradual consumption of all available memory.
+Potężnym narzędziem, które mamy w swoim arsenale, jest dziennik GC. Jest to plik tekstowy zawierający zapis operacji, które wykonuje.
 
-In both cases, the consequences can be very serious. As programmers, we need to be prepared for them and know how to deal with them.
 
-A powerful tool we have in our toolbox is the Garbage Collector log. This is a text file that is a log of the operations it performs. 
+
+
+
+
+
+
   
 
