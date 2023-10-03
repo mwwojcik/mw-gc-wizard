@@ -1,15 +1,27 @@
 ## Wstęp
 
 
-Garbage Collector to cichy bohater każdej aplikacji java. Zamknięty wewnątrz czarnego pudła z etykieta "jvm" wykonuje ciężką pracę.  Chwalimy go rzadko, bo  gdy radzi sobie świetnie, jest niewidoczny. Gdy nasza aplikacja działa źle, łatwo obwiniamy go za nadmierne zużycie pamięci lub niespodziewane, przedłużające się pauzy. 
+Garbage Collector należy do najbardziej krytycznych komponentów JVM.   
+Jego głównym zadaniem jest automatyczny proces alokacji i zwalniania pamięci. Ponieważ to trudne i wymagające 
+zadanie przeprowadzone jest bez jakiegokolwiek udziału programisty, bardzo często zapominamy o tym, że taki proces w 
+ogóle się odbywa. Niestety może okazać się to dosyć ryzykowne, o ile uświadomimy sobie jeden podstawowy fakt. 
+Mechanizm ten współdzieli zasoby z naszą aplikacją. W pewnych określonych warunkach, podczas nieoptymalnej pracy 
+może stać się on "głośnym sąsiadem" dla kodu naszej własnej aplikacji. Gdy wątki Garbage Collectora zużywają zbyt 
+dużo zasobów, zaczyna ich brakować dla wątków realizujących logikę biznesową. Wtedy cała aplikacja zaczyna cierpieć 
+z powodu przedłużających się pauz lub nadmiernego zużycia pamięci. A to jest przyczyną zauważalnego spadku wydajności. 
+Zwykle jest to moment, gdy my, jako programiści zmuszeni jesteśmy opuścić własną strefę komfortu i włączyć się do 
+akcji, dokonać diagnozy i zaaplikować skuteczne poprawki. Poszukiwanie przyczyn tego rodzaju problemów to proces 
+trudny i czasochłonny. Wymaga wiedzy na temat działania wirtualnej maszyny, modelu 
+pamięciowego oraz samego Garbage Collectora.  Na szczęście nie pozostajemy z tym sami, ponieważ dysponujemy 
+narzędziami, które mogą nam w tym pomóc. 
 
-Poszukiwanie przyczyn to proces trudny i czasochłonny. Wymaga wiedzy na temat działania wirtualnej maszyny, modelu pamięciowego oraz specyfiki działania samego Garbage Collectora. Na szczęście nie pozostajemy z tym sami, dysponujemy narzędziami, które mogą nam w tym pomóc. W dzisiejszym artykule opiszę w jaki sposób sami możemy stworzyć takie narzędzie.
+W dzisiejszym artykule spróbuję pokazać, w jaki sposób sami możemy stworzyć takie narzędzie.
 
 Zanim zaczniemy jednak pisać kod, przypomnijmy sobie kilka najważniejszych informacji o naszym bohaterze.
 
-Garbage Collector to proces JVM specjalizujący się w przydzielaniu i zwalnianiu pamięci. 
-
-Bazuje on na koncepcji zwanej Hipotezą Generacyjną. Zakłada ona, że najszybciej niepotrzebne stają się obiekty najmłodsze. Im obiekt jest starszy, tym większe są szanse że jest on potrzebny. Należy więc nasze obiekty uszeregować na podstawie ich starszeństwa.
+Bazuje on na koncepcji zwanej Hipotezą Generacyjną. Zakłada ona, że najszybciej niepotrzebne stają się obiekty 
+najmłodsze. Im obiekt jest starszy, tym większe są szanse, że jest on potrzebny. Aby skutecznie zarządzać 
+obiektami, należy uszeregować je na podstawie ich starszeństwa.
 
 Zgodnie z tymi założeniami,  pamięć została podzielona na regiony- nazywane generacjami (młodą i starą). Młoda generacja jest podzielona na kilka wewnętrznych obszarów, nazywanych Eden, Survivor 0, Survivor 1. 
 
