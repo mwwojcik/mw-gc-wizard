@@ -1,12 +1,16 @@
 ## Wstęp
 
-Garbage Collector to cichy bohater każdej aplikacji java. Zamknięty wewnątrz czarnego pudła z etykieta "jvm" wykonuje ciężką pracę, której nikt inny wykonywać nie chce.  Chwalimy go rzadko, bo  gdy radzi sobie świetnie, jest niewidoczny. Narzekamy, gdy jego nieprawidłowa praca skutkuje nadmiernym zużyciem pamięci lub niespodziewanymi pauzami aplikacji. Poszukiwanie przyczyn to proces trudny i czasochłonny. Wymaga wiedzy na temat działania wirtualnej maszyny, modelu pamięciowego oraz specyfiki działania samego Garbage Collectora. Na szczęście nie pozostajemy z tym sami, dysponujemy narzędziami, które mogą nam w tym pomóc. W dzisiejszym artykule opiszę w jaki sposób sami możemy stworzyć takie narzędzie.
+
+Garbage Collector to cichy bohater każdej aplikacji java. Zamknięty wewnątrz czarnego pudła z etykieta "jvm" wykonuje ciężką pracę.  Chwalimy go rzadko, bo  gdy radzi sobie świetnie, jest niewidoczny. Gdy nasza aplikacja działa źle, łatwo obwiniamy go za nadmierne zużycie pamięci lub niespodziewane, przedłużające się pauzy. 
+
+Poszukiwanie przyczyn to proces trudny i czasochłonny. Wymaga wiedzy na temat działania wirtualnej maszyny, modelu pamięciowego oraz specyfiki działania samego Garbage Collectora. Na szczęście nie pozostajemy z tym sami, dysponujemy narzędziami, które mogą nam w tym pomóc. W dzisiejszym artykule opiszę w jaki sposób sami możemy stworzyć takie narzędzie.
 
 Zanim zaczniemy jednak pisać kod, przypomnijmy sobie kilka najważniejszych informacji o naszym bohaterze.
 
 Garbage Collector to proces JVM specjalizujący się w przydzielaniu i zwalnianiu pamięci. 
 
-Bazuje on na koncepcji zwanej Hipotezą Generacyjną. Zakłada ona, że najszybciej niepotrzebne stają się obiekty najmłodsze. Im obiekt jest starszy, tym większe są szanse że jest on potrzebny.
+Bazuje on na koncepcji zwanej Hipotezą Generacyjną. Zakłada ona, że najszybciej niepotrzebne stają się obiekty najmłodsze. Im obiekt jest starszy, tym większe są szanse że jest on potrzebny. Należy więc nasze obiekty uszeregować na podstawie ich starszeństwa.
+
 Zgodnie z tymi założeniami,  pamięć została podzielona na regiony- nazywane generacjami (młodą i starą). Młoda generacja jest podzielona na kilka wewnętrznych obszarów, nazywanych Eden, Survivor 0, Survivor 1. 
 
 W każdym z tych obszarów przechowywane są obiekty o określonej dojrzałości. 
