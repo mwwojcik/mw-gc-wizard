@@ -1,17 +1,30 @@
 ## Wstęp
 
 
-Garbage Collector należy do najbardziej krytycznych komponentów JVM.   
-Jego głównym zadaniem jest automatyczny proces alokacji i zwalniania pamięci. Ponieważ to trudne i wymagające 
+Garbage Collector należy do najbardziej krytycznych komponentów JVM.
+Jest to proces java, który zajmuje się alokacją i zwalnianiem pamięci. Kontroluje obiekty powstałe podczas działania 
+aplikacji,  identyfikuje te, które powinny zostać usunięte i finalnie je usuwa.
+
+**TODO-łącznik**
+
+<!--Ponieważ to trudne i wymagające 
 zadanie przeprowadzone jest bez jakiegokolwiek udziału programisty, bardzo często zapominamy o tym, że taki proces w 
-ogóle się odbywa. Niestety może okazać się to dosyć ryzykowne, o ile uświadomimy sobie jeden podstawowy fakt. 
-Mechanizm ten współdzieli zasoby z naszą aplikacją. W pewnych określonych warunkach, podczas nieoptymalnej pracy 
-może stać się on "głośnym sąsiadem" dla kodu naszej własnej aplikacji. Gdy wątki Garbage Collectora zużywają zbyt 
+ogóle się odbywa.-->
+
+
+Niestety może okazać się to dosyć ryzykowne, o ile uświadomimy sobie jeden podstawowy fakt. 
+Mechanizm ten współdzieli zasoby z naszą aplikacją. W pewnych warunkach, podczas nieoptymalnej pracy 
+może stać się on "głośnym sąsiadem" dla kodu naszej własnej aplikacji. 
+
+Gdy wątki Garbage Collectora zużywają zbyt 
 dużo zasobów, zaczyna ich brakować dla wątków realizujących logikę biznesową. Wtedy cała aplikacja zaczyna cierpieć 
 z powodu przedłużających się pauz lub nadmiernego zużycia pamięci. A to jest przyczyną zauważalnego spadku wydajności. 
+
 Zwykle jest to moment, gdy my, jako programiści zmuszeni jesteśmy opuścić własną strefę komfortu i włączyć się do 
 akcji, dokonać diagnozy i zaaplikować skuteczne poprawki. Poszukiwanie przyczyn tego rodzaju problemów to proces 
-trudny i czasochłonny. Wymaga wiedzy na temat działania wirtualnej maszyny, modelu 
+trudny i czasochłonny. 
+
+Wymaga wiedzy na temat działania wirtualnej maszyny, modelu 
 pamięciowego oraz samego Garbage Collectora.  Na szczęście nie pozostajemy z tym sami, ponieważ dysponujemy 
 narzędziami, które mogą nam w tym pomóc. 
 
